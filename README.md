@@ -2,7 +2,7 @@
 
 ![Game Screenshot](7x6_board.png)
 
-I saw this video online and wanted to create the simple, pretty UI with my own contribution. Not sure whose application he is running, but I am to lazy to look. I also made a CLI version of the game before created the pretty version to explore the main 'win checking' algorithm. Overall a fun project.
+I saw this video online and wanted to create the simple, pretty UI with my own contribution. Not sure whose application he is running, but I am to lazy to look. I also made a CLI version of the game before creating the pretty version to explore the main 'win checking' algorithm. Overall a fun project.
 
 -Update: Didn't realize it was supposed to be a 7x6 board. It is now updated, but this is easily changable. Thank goodness for global variables.
 
