@@ -3,13 +3,10 @@ import tkinter as tk
 from collections import deque
 
 CELL_SIZE = 80
-ROWS, COLS = 7, 7
-PADDING = 30 
-
-CELL_SIZE = 80
-ROWS, COLS = 7, 7
-PADDING_X = 50  
+ROWS, COLS = 6, 7
+PADDING_X = 50
 PADDING_Y = 30
+
 
 
 
