@@ -8,5 +8,19 @@ I saw this video online and wanted to create the simple, pretty UI with my own c
 
 link: https://youtu.be/iIF0Ha-1h6c?si=ugrcV8njugyENPUQ
 
+## Running the game (easy):
+In order to run the application, it is straight-forward. Just make sure you have Python, and also make sure you have the 'tkinter' library. 
+
+### Run the GUI version:
+```
+python3 connect4_gui.py
+```
+
+### Run the CLI version:
+```
+python3 connect4_cli.py
+```
+
 Here is the demonstrated 7x7 board:
+
 ![Game Screenshot](C4_gameplay.png)
