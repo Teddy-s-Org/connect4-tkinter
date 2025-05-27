@@ -21,6 +21,11 @@ python3 connect4_gui.py
 python3 connect4_cli.py
 ```
 
-Here is the demonstrated 7x7 board:
+## Algorithm Description:
+The win-checking algorithm operates by evaluating the most recent move made by a player, rather than scanning the entire board. From that single position, it checks in four directions: horizontal, vertical, and both diagonals, counting consecutive matching pieces in both directions along each line. If the total count reaches four, it confirms a win.
+
+By focusing only on the most recent move, the algorithm avoids unnecessary computation and reduces the number of positions it needs to evaluate. This makes it highly efficient for small, fixed-size grids like Connect 4. On a 6x7 board, each direction involves at most six checks (three in each direction), leading to a worst-case time complexity of O(1) - constant time relative to board size. Memory usage is minimal and remains O(1) since no additional data structures are created beyond local counters. This makes the approach both fast and memory-efficient for real-time gameplay.
+
+## 7x7 board:
 
 ![Game Screenshot](C4_gameplay.png)
