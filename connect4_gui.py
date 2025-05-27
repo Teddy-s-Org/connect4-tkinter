@@ -1,19 +1,21 @@
-
 import tkinter as tk
 from collections import deque
+import random
+import argparse
+import sys
+from ai_medium import get_best_move
+from ai_easy import get_easy_move
 
 CELL_SIZE = 80
 ROWS, COLS = 6, 7
 PADDING_X = 50
 PADDING_Y = 30
 
-
-
-
 class Connect4GUI:
-    def __init__(self, root):
+    def __init__(self, root, mode="2p"):
         self.root = root
         self.root.title("Connect 4")
+        self.mode = mode
 
         self.canvas = tk.Canvas(
             root,
@@ -21,7 +23,6 @@ class Connect4GUI:
             height=ROWS * CELL_SIZE + PADDING_Y * 2,
             bg="#3a3aa4"
         )
-
 
         self.canvas.pack()
 
@@ -36,6 +37,26 @@ class Connect4GUI:
         self.canvas.bind("<Motion>", self.track_mouse)
         self.draw_board()
 
+    def ai_move(self):
+        if self.mode == "easy":
+            self.ai_easy()
+        elif self.mode == "medium":
+            col = get_best_move(self.board, ROWS, COLS, 'Y')
+            if col is not None:
+                self.drop_piece('Y', col)
+        elif self.mode == "hard":
+            from ai_hard import get_hard_move
+            col = get_hard_move(self.board, ROWS, COLS, 'Y', depth=4)
+            if col is not None:
+                self.drop_piece('Y', col)
+
+
+    def ai_easy(self):
+        col = get_easy_move(self.board, ROWS, COLS, ai_color='Y', human_color='R')
+        if col is not None:
+            self.drop_piece('Y', col)
+
+
     def track_mouse(self, event):
         if self.game_over:
             self.hover_col = None
@@ -48,9 +69,6 @@ class Connect4GUI:
         else:
             self.hover_col = col
         self.draw_board()
-
-
-
 
     def draw_board(self):
         
@@ -107,7 +125,6 @@ class Connect4GUI:
             center_x = PADDING_X + (COLS * CELL_SIZE) // 2
             center_y = PADDING_Y + (ROWS * CELL_SIZE) // 2
 
-
             self.canvas.create_text(
                 center_x, center_y,
                 text=self.win_message, fill="white", font=('Arial', 32, 'bold')
@@ -116,9 +133,6 @@ class Connect4GUI:
                 center_x, center_y + 40,
                 text="Click anywhere to restart", fill="white", font=('Arial', 16)
             )
-
-
-
 
     def handle_click(self, event):
         if self.game_over:
@@ -130,12 +144,15 @@ class Connect4GUI:
             return  # ignore invalid clicks
 
         if 'X' in self.board[col]:
-            player = 'R' if self.turns % 2 == 0 else 'Y'
+            if self.mode == "2p":
+                player = 'R' if self.turns % 2 == 0 else 'Y'
+            else:
+                player = 'R'  # Human is always Red vs. AI
             row = self.drop_piece(player, col)
             self.draw_board()
 
             if row is not None and self.check_win(col, row):
-                self.win_message = f"{'Red' if player == 'R' else 'Yellow'} Wins!"
+                self.win_message = "Red Wins!"
                 self.game_over = True
                 self.draw_board()
                 return
@@ -148,8 +165,22 @@ class Connect4GUI:
 
             self.turns += 1
 
+            # 🟡 Only trigger AI if not in 2-player mode
+            if self.mode != "2p" and not self.game_over:
+                self.ai_move()
+                self.draw_board()
 
+                # Check if AI won
+                for c in range(COLS):
+                    for r in range(ROWS):
+                        if self.board[c][r] == 'Y':
+                            if self.check_win(c, r):
+                                self.win_message = "Yellow Wins!"
+                                self.game_over = True
+                                self.draw_board()
+                                return
 
+                self.turns += 1
 
 
     def drop_piece(self, player, col):
@@ -229,11 +260,14 @@ class Connect4GUI:
         )
 
 
+def parse_args():
+    parser = argparse.ArgumentParser(description="Play Connect 4 with different difficulty levels.")
+    parser.add_argument("mode", choices=["2p", "easy", "medium", "hard"],
+                        help="Game mode: '2p' for two players, or 'easy', 'medium', 'hard' for AI difficulty.")
+    return parser.parse_args()
 
-
-
-
-# Run the game
-root = tk.Tk()
-app = Connect4GUI(root)
-root.mainloop()
+if __name__ == "__main__":
+    args = parse_args()
+    root = tk.Tk()
+    app = Connect4GUI(root, mode=args.mode)
+    root.mainloop()
