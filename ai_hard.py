@@ -85,20 +85,20 @@ def score_position(board, col, row, player, rows, cols):
 
     opponent = 'R' if player == 'Y' else 'Y'
 
-    # --- Winning move
+    # Winning move
     if check_win(board, col, row, player, rows, cols):
         return 10000  # highest possible score
 
-    # --- Blocking move
+    # BLocking move
     board[col][row] = opponent
     if check_win(board, col, row, opponent, rows, cols):
         score += 300  # increased from 200
     board[col][row] = player
 
-    # --- Center bias
+    # Center bias
     score += max(0, 1 - abs(center_col - col))  # max +1
 
-    # --- Line-building: 2s and 3s
+    # Line-building: 2s and 3s
     directions = [(1, 0), (0, 1), (1, 1), (1, -1)]
     forks = 0  # count possible forks
     for dx, dy in directions:
@@ -112,11 +112,11 @@ def score_position(board, col, row, player, rows, cols):
             score += 150
             forks += 1
 
-    # --- Reward creating a fork (multiple 3-in-a-rows)
+    # Reward creating a fork (multiple 3-in-a-rows)
     if forks >= 2:
         score += 400
 
-    # --- Trap detection: avoid letting opponent create a fork
+    # trap detection: avoid letting opponent create a fork
     for test_col in range(cols):
         if 'X' not in board[test_col]:
             continue
