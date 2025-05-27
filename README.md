@@ -12,10 +12,10 @@ project inspiration link: https://youtu.be/iIF0Ha-1h6c?si=ugrcV8njugyENPUQ
 
 - 2p: Classic two-player mode where both players are human. No AI involved.
 - easy: Rule-based AI that follows simple logic: it checks if it can win in one move, blocks the opponent’s immediate win if needed, and otherwise chooses a random valid column. This mode is fast and casual, ideal for testing or quick games.
-- medium: Heuristic-based AI that evaluates the board using a scoring function. It considers winning moves, blocking moves, center control, aligned pieces (2-in-a-row, 3-in-a-row), and fork creation/avoidance. It also features a 2-ply defensive lookahead to avoid walking into basic traps. Recent updates include hardcoded pattern detection to avoid known fork-loss scenarios that can’t be caught by heuristics alone. NOTE: the medium AI has some interesting characteristics where it doesn't recognize a super easy trapping strategy. I tried to hardcode the solution, but it still doesn't want to work. If this really bothers you, you are more than welcome to get humbled by the hard AI. (or fork this repo and find a fix lol)
+- medium: Heuristic-based AI that evaluates the board using a scoring function. It considers winning moves, blocking moves, center control, aligned pieces (2-in-a-row, 3-in-a-row), and fork creation/avoidance. It also features a 2-ply defensive lookahead to avoid walking into basic traps. NOTE: the medium AI has some interesting characteristics where it doesn't recognize a super easy trapping strategy. I tried to hardcode the solution, but it still doesn't want to work. If this really bothers you, you are more than welcome to get humbled by the hard AI. (or fork this repo and find a fix lol)
 - hard: Strategic AI powered by the Minimax algorithm with alpha-beta pruning and a depth-limited search (default: 4 plies). It simulates future move sequences, applies the same evaluation heuristics as the medium AI, and makes deeply informed decisions. The hard AI is significantly more challenging and much harder to exploit with traps.
 
-## Running the game (easy):
+## Running the game (super easy):
 In order to run the application, it is straight-forward. Just make sure you have Python, and also make sure you have the 'tkinter' library.
 
 ### Run the GUI version:
