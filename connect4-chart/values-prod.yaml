@@ -1,0 +1,10 @@
+replicaCount: 2
+
+image:
+  repository: connect4-web
+  tag: latest
+  pullPolicy: IfNotPresent  # If testing locally; change to IfNotPresent if using Docker Hub
+
+service:
+  type: NodePort
+  port: 8000

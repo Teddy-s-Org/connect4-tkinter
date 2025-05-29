@@ -1,0 +1,10 @@
+replicaCount: 1
+
+image:
+  repository: connect4-web
+  tag: latest
+  pullPolicy: Never
+
+service:
+  type: NodePort
+  port: 8000
