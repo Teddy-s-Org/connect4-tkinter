@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: connect4-web
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: connect4-web
+  template:
+    metadata:
+      labels:
+        app: connect4-web
+    spec:
+      containers:
+      - name: connect4-web
+        image: connect4-web
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 8000

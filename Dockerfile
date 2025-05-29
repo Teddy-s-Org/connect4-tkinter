@@ -9,15 +9,6 @@
 ARG PYTHON_VERSION=3.13.3
 FROM python:${PYTHON_VERSION}-slim as base
 
-# Install tkinter and related GUI libraries
-RUN apt-get update && apt-get install -y \
-    python3-tk \
-    tk \
-    tcl \
-    libx11-6 \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
-
 
 # Prevents Python from writing pyc files.
 ENV PYTHONDONTWRITEBYTECODE=1
@@ -58,4 +49,5 @@ COPY . .
 EXPOSE 8000
 
 # Run the application.
-CMD python3 connect4_cli.py
+CMD ["python3", "web.py"]
+
