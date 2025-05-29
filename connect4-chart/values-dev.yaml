@@ -1,9 +1,9 @@
 replicaCount: 1
 
 image:
-  repository: connect4-web
-  tag: latest
-  pullPolicy: Never
+  repository: tevander232/connect4-web
+  tag: dev
+  pullPolicy: IfNotPresent
 
 service:
   type: NodePort

@@ -9,6 +9,8 @@ num_turns = 0
 output = []
 game_over = False
 
+# Dev test: update CI pipeline
+
 TEMPLATE = """
 <!DOCTYPE html>
 <html>
