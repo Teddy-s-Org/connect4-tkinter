@@ -22,6 +22,16 @@ jobs:
       - name: Build Docker image
         run: docker build -t connect4-web:${{ env.IMAGE_TAG }} .
 
+      - name: Log in to Docker Hub
+        run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+
+      - name: Tag image for Docker Hub
+        run: docker tag connect4-web:${{ env.IMAGE_TAG }} tevander232/connect4-web:${{ env.IMAGE_TAG }}
+
+      - name: Push image to Docker Hub
+        run: docker push tevander232/connect4-web:${{ env.IMAGE_TAG }}
+
+
       - name: Set up Kubectl
         uses: azure/setup-kubectl@v3
         with:
@@ -37,9 +47,11 @@ jobs:
       - name: Deploy to Dev with Helm
         run: |
           helm upgrade --install connect4-dev ./connect4-chart \
+            --set image.repository=tevander232/connect4-web \
             --set image.tag=${{ env.IMAGE_TAG }} \
             -f ./connect4-chart/values-dev.yaml \
             --namespace dev --create-namespace
+
 
       - name: Verify Kubernetes Access
         run: kubectl get pods -n dev
