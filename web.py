@@ -9,7 +9,7 @@ num_turns = 0
 output = []
 game_over = False
 
-# Dev test: update CI pipeline
+# Dev test: update CI pipeline, adding to GHA
 
 TEMPLATE = """
 <!DOCTYPE html>
