@@ -1,44 +1,115 @@
-# Connect 4 (Python)
+# Overview:
+I spent some time creating my own connect 4 game recently, and I focused heavily on creating a pretty UI and an AI bot with varying difficulty to play against. However, the purose of the **dev** and **main** branches of this repo were created for the purpose of exploring some basic DevOps tooling. So, I deployed a simple web version of my connect 4 game in order to solidify my understanding of CI/CD using Docker, Kubernetes, Helm, Github Actions, etc.
 
-![Game Screenshot](7x6_board.png)
+**if you are here for the UI/AI Connect 4 game, go to the 'experimental' branch.**
 
-I saw this video online and wanted to create the simple, pretty UI with my own contribution. Not sure whose application he is running, but I am to lazy to look. I also made a CLI version of the game before creating the pretty version to explore the main 'win checking' algorithm. Overall a fun project.
+My goal was to understand how modern software projects are developled, deployed and maintained in a scalable, containerized enviornment.
 
-project inspiration link: https://youtu.be/iIF0Ha-1h6c?si=ugrcV8njugyENPUQ
+# Dockerization:
+A Dockerfile was created to package this app using a slim Python base image and a non-root user.
 
-- UPDATE: I added an optional AI that you can play against. There is 3 difficulties (easy, medium, hard). You can still play 2 player mode as well.
-
-## This project now supports four different game modes, each offering a different level of challenge and behavior:
-
-- 2p: Classic two-player mode where both players are human. No AI involved.
-- easy: Rule-based AI that follows simple logic: it checks if it can win in one move, blocks the opponent’s immediate win if needed, and otherwise chooses a random valid column. This mode is fast and casual, ideal for testing or quick games.
-- medium: Heuristic-based AI that evaluates the board using a scoring function. It considers winning moves, blocking moves, center control, aligned pieces (2-in-a-row, 3-in-a-row), and fork creation/avoidance. It also features a 2-ply defensive lookahead to avoid walking into basic traps. NOTE: the medium AI has some interesting characteristics where it doesn't recognize a super easy trapping strategy. I tried to hardcode the solution, but it still doesn't want to work. If this really bothers you, you are more than welcome to get humbled by the hard AI. (or fork this repo and find a fix lol)
-- hard: Strategic AI powered by the Minimax algorithm with alpha-beta pruning and a depth-limited search (default: 4 plies). It simulates future move sequences, applies the same evaluation heuristics as the medium AI, and makes deeply informed decisions. The hard AI is significantly more challenging and much harder to exploit with traps.
-
-## Running the game (super easy):
-In order to run the application, it is straight-forward. Just make sure you have Python, and also make sure you have the 'tkinter' library.
-
-### Run the GUI version:
-You can launch the game with a selected difficulty using:
-
+To build the Docker image locally:
 ```
-python3 connect4_gui.py [2p | easy | medium | hard]
-```
-For example:
-```
-python3 connect4_gui.py medium
+docker build -t connect4-web .
 ```
 
-### Run the CLI version:
+To run the Docker container:
 ```
-python3 connect4_cli.py
+docker run -p 8000:8000 connect4-web
+```
+this allows for consistent enviornments across machines.
+
+# Kubernetes with Minikube
+I used minikube to simulate a kubernetes cluster on my local machine.
+
+Deployed the app using kubectl:
+
+```
+kubectl create deployment connect4-web --image=connect4-web
+kubectl expose deployment connect4-web --type=NodePort --port=8000
+minikube service connect4-web --url
 ```
 
-## Algorithm Description:
-The win-checking algorithm operates by evaluating the most recent move made by a player, rather than scanning the entire board. From that single position, it checks in four directions: horizontal, vertical, and both diagonals, counting consecutive matching pieces in both directions along each line. If the total count reaches four, it confirms a win.
+i also used commands like 
+```
+kubectl get pods
+kubectl get svc
+kubectl logs pod-name
+```
+this gave me an understanding of how deployments, services, and pods interact.
 
-By focusing only on the most recent move, the algorithm avoids unnecessary computation and reduces the number of positions it needs to evaluate. This makes it highly efficient for small, fixed-size grids like Connect 4. On a 6x7 board, each direction involves at most six checks (three in each direction), leading to a worst-case time complexity of O(1) - constant time relative to board size. Memory usage is minimal and remains O(1) since no additional data structures are created beyond local counters. This makes the approach both fast and memory-efficient for real-time gameplay.
+# Helm chart Integration
 
-## 7x7 board:
+I created a helm chart (connect4-chart/) to template the kubernetes.
+I created two values files: `values-dev.yaml` for dev: 1 replica, tag = latest, and `values-prod.yaml` for prod: 2 replicas, tag = commit SHA
 
-![Game Screenshot](C4_gameplay.png)
+I installed the chart with:
+```
+helm install connect4-dev ./connect4-chart -f values-dev.yaml --namespace dev
+```
+
+Using helm to make updates:
+```
+helm upgrade connect4-dev ...
+```
+
+# Environment Seperation:
+I created seperate `dev` and `prod` kubernetes namespaces to isolate environments.
+```
+kubectl create namespace dev
+```
+```
+kubectl create namespace prod
+```
+helm deployments target the correct namespace using:
+```
+--namespace dev --create-namespace
+```
+
+this makes sure I can test changes in `dev` without affecting production
+
+# Branching strategy:
+
+`dev` branch: used for development, all changes are tested here first
+`main` branch: used for production deployments, only stable code is merged here.
+`experimental` branchL used for UI/AI functionality, not connected to deployment.
+When I want to promote changes, I merge dev into main.
+
+# CI/CD with GitHub actions:
+
+I configured github actions to automate the full pipeline:
+When I push to `dev`, a Docker image is built and pushed to Docker hub, then deployed to `dev` namespace.
+When I push to `main`, the same happens for `prod`.
+
+each workflow uses a self-hosted runner so it cna access local minikube. they also each set docker tags to the commit SHA.
+each workflow uses helm to deploy:
+```
+helm upgrade --install connect4-dev ...
+```
+
+Secrets:
+`DOCKER_USERNAME`, `DOCKER_PASSWORD`, `KUBECONFIG_DATA` for accessing minikube from github actions
+
+# Docker Hub integration
+
+Created a public repository `connect4-web`
+Docker image names follow this convention:
+```
+tevander232/connect4-web:<commit-sha>
+```
+
+# testing the setup:
+
+to test a dev deployment:
+1. make a change in the `dev` branch
+2. commit and push 
+3. watch the action run in github
+4. confirm image shows up on docker hub
+5. confirm pod updates with: `kubectl get pods -n dev`
+6. open dev service: `minikube service connect4-dev-connect4-chart -n dev --url`
+
+to promote to prod:
+1. merge dev into main
+2. push `main`, watch the prod action run
+3. visit `minikube service connect4-prod-connect4-chart -n prod --url`
+
