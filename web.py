@@ -8,13 +8,15 @@ board = [deque(['X'] * 7) for _ in range(7)]
 num_turns = 0
 output = []
 game_over = False
+print("Testing CI/CD pipeline for the dev")
+
 
 # Dev test: update CI pipeline, adding to GHA
 
 TEMPLATE = """
 <!DOCTYPE html>
 <html>
-<head><title>Connect 4 Main</title></head>
+<head><title>Connect 4</title></head>
 <body>
 <pre>{{output}}</pre>
 {% if not game_over %}

@@ -7,7 +7,7 @@ on:
 
 jobs:
   build-and-deploy:
-    runs-on: self-hosted  # or [self-hosted, macOS]
+    runs-on: self-hosted  # assumes you have Docker, Helm, and Kubectl set up
 
     steps:
       - name: Checkout code
@@ -16,19 +16,49 @@ jobs:
       - name: Set up Docker
         uses: docker/setup-buildx-action@v3
 
+      - name: Set image tag from commit SHA
+        run: echo "IMAGE_TAG=${GITHUB_SHA}" >> $GITHUB_ENV
+
       - name: Build Docker image
-        run: docker build -t connect4-web .
+        run: docker build -t connect4-web:${{ env.IMAGE_TAG }} .
+
+      - name: Log in to Docker Hub
+        run: |
+          echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+          docker info
+
+
+      - name: Tag image for Docker Hub
+        run: docker tag connect4-web:${{ env.IMAGE_TAG }} tevander232/connect4-web:${{ env.IMAGE_TAG }}
+
+      - name: Debug Docker images
+        run: docker images
+
+
+      - name: Push image to Docker Hub
+        run: docker push tevander232/connect4-web:${{ env.IMAGE_TAG }}
+
 
       - name: Set up Kubectl
         uses: azure/setup-kubectl@v3
         with:
           version: 'latest'
 
+      - name: Set up Kubeconfig
+        run: |
+          mkdir -p $HOME/.kube
+          echo "$KUBECONFIG_DATA" | base64 --decode > $HOME/.kube/config
+        env:
+          KUBECONFIG_DATA: ${{ secrets.KUBECONFIG_DATA }}
+
       - name: Deploy to Dev with Helm
         run: |
           helm upgrade --install connect4-dev ./connect4-chart \
+            --set image.repository=tevander232/connect4-web \
+            --set image.tag=${{ env.IMAGE_TAG }} \
             -f ./connect4-chart/values-dev.yaml \
             --namespace dev --create-namespace
 
+
       - name: Verify Kubernetes Access
-        run: kubectl get namespaces
+        run: kubectl get pods -n dev
