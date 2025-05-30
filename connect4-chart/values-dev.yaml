@@ -2,7 +2,7 @@ replicaCount: 1
 
 image:
   repository: tevander232/connect4-web
-  tag: dev
+  tag: latest
   pullPolicy: IfNotPresent
 
 service:
