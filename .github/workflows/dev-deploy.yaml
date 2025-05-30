@@ -31,6 +31,10 @@ jobs:
       - name: Tag image for Docker Hub
         run: docker tag connect4-web:${{ env.IMAGE_TAG }} tevander232/connect4-web:${{ env.IMAGE_TAG }}
 
+      - name: Debug Docker images
+        run: docker images
+
+
       - name: Push image to Docker Hub
         run: docker push tevander232/connect4-web:${{ env.IMAGE_TAG }}
 
