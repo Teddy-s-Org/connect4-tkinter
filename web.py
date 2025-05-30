@@ -8,7 +8,7 @@ board = [deque(['X'] * 7) for _ in range(7)]
 num_turns = 0
 output = []
 game_over = False
-print("Testing CI/CD pipeline for thee dev")
+print("Testing CI/CD pipeline for thhee dev")
 
 
 # Dev test: update CI pipeline, adding to GHA
