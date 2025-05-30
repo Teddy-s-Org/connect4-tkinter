@@ -14,7 +14,7 @@ game_over = False
 TEMPLATE = """
 <!DOCTYPE html>
 <html>
-<head><title>Connect 4</title></head>
+<head><title>Connect 4 Main</title></head>
 <body>
 <pre>{{output}}</pre>
 {% if not game_over %}
